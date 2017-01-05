@@ -4,14 +4,6 @@ scriptencoding utf8
 
 let b:dummy_sign_set_map = {}
 
-if !hlexists('ALEErrorSign')
-    highlight link ALEErrorSign error
-endif
-
-if !hlexists('ALEWarningSign')
-    highlight link ALEWarningSign todo
-endif
-
 if !hlexists('ALEError')
     highlight link ALEError SpellBad
 endif
@@ -19,6 +11,41 @@ endif
 if !hlexists('ALEWarning')
     highlight link ALEWarning SpellCap
 endif
+
+function! s:hlexists_and_is_not_cleared(group)
+    if !hlexists(a:group)
+        return 1
+    endif
+
+    redir => l:hlstatus | exec 'silent highlight ' . a:group | redir END
+
+    return l:hlstatus !~# 'cleared'
+endfunction
+
+function! ale#sign#DefineHighlights() abort
+    let l:ctermbg = ale#util#GetHighlight('SignColumn', 'bg')
+    let l:guibg = ale#util#GetHighlight('SignColumn', 'bg#')
+    " TODO: figure out how to define cterm color value
+    " let l:bg = 'ctermbg=' . l:ctermbg . ' guibg=' . l:guibg
+    let l:bg = 'guibg=' . l:guibg
+
+    for [l:group, l:fg] in items({
+          \ 'ALEErrorSign': ale#util#GetHighlight('Error', 'bg'),
+          \ 'ALEWarningSign': ale#util#GetHighlight('Todo', 'fg'),
+          \ })
+
+        " TODO: figure out how to define cterm color value
+        " execute 'highlight ' . l:group . 'Default ctermfg=' . l:fg . ' guifg=' . l:fg . ' ' . l:bg
+        execute 'highlight ' . l:group . 'Default guifg=' . l:fg . ' ' . l:bg
+
+        " TODO: figure out why highlight exists or is cleared
+        " if !s:hlexists_and_is_not_cleared(l:group)
+            execute 'highlight link ' . l:group . ' ' . l:group . 'Default'
+        " endif
+    endfor
+endfunction
+
+call ale#sign#DefineHighlights()
 
 " Signs show up on the left for error markers.
 execute 'sign define ALEErrorSign text=' . g:ale_sign_error

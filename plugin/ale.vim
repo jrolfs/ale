@@ -136,6 +136,13 @@ nnoremap <silent> <Plug>(ale_previous_wrap) :ALEPreviousWrap<Return>
 nnoremap <silent> <Plug>(ale_next) :ALENext<Return>
 nnoremap <silent> <Plug>(ale_next_wrap) :ALENextWrap<Return>
 
+" Sign highlights
+
+augroup ALESignHighlightGroup
+  autocmd!
+  autocmd ColorScheme * call ale#sign#DefineHighlights()
+augroup END
+
 " Housekeeping
 
 augroup ALECleanupGroup

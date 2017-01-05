@@ -121,3 +121,29 @@ function! ale#util#BinarySearch(loclist, line, column) abort
         endif
     endwhile
 endfunction
+
+" Get property from highlighting group.
+function! ale#util#GetHighlight(group, what) abort
+    let l:reverse = synIDattr(synIDtrans(hlID(a:group)), 'reverse')
+    let l:what = a:what
+
+    if l:reverse
+        if l:what ==# 'fg'
+            let l:what = 'bg'
+        elseif l:what ==# 'bg'
+            let l:what = 'fg'
+        elseif l:what ==# 'fg#'
+            let l:what = 'bg#'
+        elseif l:what ==# 'bg#'
+            let l:what = 'fg#'
+        endif
+    endif
+
+    let l:val = synIDattr(synIDtrans(hlID(a:group)), l:what)
+
+    if l:val == -1
+        let l:val = 'NONE'
+    endif
+
+    return l:val
+endfunction
